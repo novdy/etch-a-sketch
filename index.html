@@ -2,9 +2,112 @@
 <html>
     <head>
         <title>Etch-a-Sketch</title>
+        <link rel="stylesheet" href="bootstrap-reboot.min.css">
+        <style>
+            html, body{
+                text-align: center;
+            }
+            .container {
+                display: inline-block;
+                width: 40vw;
+                height: 40vw;
+                padding: 0px;
+                border: 3px solid black;
+                margin: 0px;
+            }
+        </style>
     </head>
 
     <body>
-        
+        <h1>Etch-a-Sketch</h1>
+        <div class="container"></div><br>
+        <button onclick="resizeGrid()">Resize grid</button>
     </body>
+
+    <script>   
+        let container = document.querySelector(".container");
+        let cellsPerRow = 16;
+        let dimension = ((+getComputedStyle(container).width.slice(0,-2) - 6) / window.innerWidth)*(100/cellsPerRow) + "vw";
+        let rows;
+        let cells;
+        let div;
+        let innerDiv;
+
+        function generateCells(){
+            for(let i = 0; i < cellsPerRow; i++){
+                div = document.createElement("div");
+                div.className = "row";
+                div.style.height = dimension;
+                div.style.overflow = "hidden";
+                container.appendChild(div);
+
+                for(let j = 0; j < cellsPerRow; j++){
+                    innerDiv = document.createElement("div");
+                    innerDiv.className = "cell";
+                    innerDiv.style.width = dimension;
+                    innerDiv.style.height = dimension;
+                    innerDiv.style.backgroundColor = "#000000";
+                    innerDiv.style.opacity = "0";
+                    innerDiv.style.cssFloat = "left";
+                    div.appendChild(innerDiv);
+                }
+            }
+        }
+
+        function addColor(){
+            cells = document.querySelectorAll(".cell");
+
+            cells.forEach((cell) => {
+                cell.addEventListener("mouseover", (e) => {
+                    cell.style.backgroundColor = "#"+((1<<24)*Math.random()|0).toString(16);
+                });
+            });
+        }
+
+        function addShading(){
+            cells = document.querySelectorAll(".cell");
+
+            cells.forEach((cell) => {
+                cell.addEventListener("mouseover", (e) => {
+                    cell.style.opacity = +cell.style.opacity + 0.1 + "";
+                });
+            });
+        }
+
+        function resizeGrid(){
+            rows.forEach((row) => {
+                while(row.firstChild){
+                    row.removeChild(row.firstChild);
+                }
+            });
+
+            while(container.firstChild){
+                container.removeChild(container.firstChild);
+            }
+
+            cellsPerRow = prompt("Enter the number of cells per row:");
+            dimension = ((+getComputedStyle(container).width.slice(0,-2) - 6) / window.innerWidth)*(100/cellsPerRow) + "vw";
+            generateCells();
+            addShading();
+        }
+        
+        generateCells();
+        addShading();
+
+        //Resize cells every 100 milliseconds
+        var timer = setInterval(() => {
+            dimension = ((+getComputedStyle(container).width.slice(0,-2) - 6) / window.innerWidth)*(100/cellsPerRow) + "vw";
+            rows = document.querySelectorAll(".row");
+            cells = document.querySelectorAll(".cell");
+        
+            rows.forEach((row) => {
+                row.style.height = dimension;
+            });
+            
+            cells.forEach((cell) => {
+                cell.style.width = dimension;
+                cell.style.height = dimension;
+            });            
+        }, 100);
+    </script>
 </html>
